@@ -9,24 +9,22 @@
 import SwiftUI
 
 struct PokemonListView: View {
-    @StateObject var ViewModel = PokemonListViewModel()
-    var body: some View {
-        NavigationStack {
+    @StateObject var ViewModel = PokemonListViewModel() // ViewModelを状態付きで保持（画面のライフサイクルに合わせて管理）
+    var body: some View { // ViewのUI構成を記述するbodyプロパティ
+        NavigationStack { // 画面遷移のためのナビゲーションスタックを定義（NavigationLinkと連動）
             GeometryReader { geometry in // 親ビューのサイズ情報を取得するためのコンテナ
                 ScrollView(.vertical) { // 縦方向のスクロールビューでコンテンツをスクロール可能にする
-
                     LazyVGrid(columns: GridItems.columns) { // グリッドレイアウトを定義
-                        ForEach(ViewModel.pokemonListEntity) { pokemon in
-                            NavigationLink {
-                                PokemonDetailView(pokemon: pokemon)
-                            } label: {
-                                AsyncImage(url: URL(string: pokemon.sprites.frontImage)) {
-                                    image in
+                        ForEach(ViewModel.pokemonListEntity) { pokemon in // ViewModelから取得したポケモン一覧をループ表示
+                            NavigationLink { // タップ時に詳細画面へ遷移するリンクを作成
+                                PokemonDetailView(pokemon: pokemon) // 遷移先の詳細画面に選択したポケモンを渡す
+                            } label: { // リンクの見た目（ラベル）を定義
+                                AsyncImage(url: URL(string: pokemon.sprites.frontImage)) { image in // 非同期に画像を読み込んで表示
                                     image
-                                        .image?
-                                        .resizable()
-                                        .aspectRatio(contentMode: .fit)
-                                        .frame(height: geometry.size.width / 3)
+                                        .image? // 読み込みに成功した画像を取得（Optionalなので?付き）
+                                        .resizable() // 画像サイズをリサイズ可能にする
+                                        .aspectRatio(contentMode: .fit) // アスペクト比を維持してフィットさせる
+                                        .frame(height: geometry.size.width / 3) // 画像の高さを画面幅の3分の1に設定
                                 }
                             }
                             .frame(width: geometry.size.width / 2.1, height: 200) // 各セルのサイズを設定（2列表示を意識）
