@@ -9,13 +9,26 @@
 import SwiftUI
 
 struct PokemonListView: View {
-
+    @StateObject var ViewModel = PokemonListViewModel()
     var body: some View {
-        GeometryReader { geometry in // 親ビューのサイズ情報を取得するためのコンテナ
-            ScrollView(.vertical) { // 縦方向のスクロールビューでコンテンツをスクロール可能にする
-                LazyVGrid(columns: GridItems.columns) { // グリッドレイアウトを定義
-                    ForEach(0..<151) { number in // 0から150までループして各ポケモンを表示
-                        Text("No.\(number)") // ポケモンの番号を表示するテキスト
+        NavigationStack {
+            GeometryReader { geometry in // 親ビューのサイズ情報を取得するためのコンテナ
+                ScrollView(.vertical) { // 縦方向のスクロールビューでコンテンツをスクロール可能にする
+
+                    LazyVGrid(columns: GridItems.columns) { // グリッドレイアウトを定義
+                        ForEach(ViewModel.pokemonListEntity) { pokemon in
+                            NavigationLink {
+                                PokemonDetailView(pokemon: pokemon)
+                            } label: {
+                                AsyncImage(url: URL(string: pokemon.sprites.frontImage)) {
+                                    image in
+                                    image
+                                        .image?
+                                        .resizable()
+                                        .aspectRatio(contentMode: .fit)
+                                        .frame(height: geometry.size.width / 3)
+                                }
+                            }
                             .frame(width: geometry.size.width / 2.1, height: 200) // 各セルのサイズを設定（2列表示を意識）
                             .background() { // 背景にカスタムデザインを追加
                                 ZStack { // 複数のビューを重ねるためのコンテナ
@@ -35,6 +48,7 @@ struct PokemonListView: View {
                                     .stroke(Color.black, // 線の色を黒に設定
                                             lineWidth: 1) // 線の太さを1に設定
                             }
+                        }
                     }
                 }
             }
